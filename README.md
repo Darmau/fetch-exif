@@ -12,6 +12,8 @@ cd fetch-exif
 npm install
 ```
 
+You will need a running MongoDB instance on your server. The URL of the database can be set in the `.env` file.
+
 ## Usage
 
 Start the server using the following command:

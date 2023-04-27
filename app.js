@@ -6,7 +6,9 @@ const { Raw } = require("./lib/database");
 const app = express();
 const port = 1216;
 
-mongoose.connect("mongodb://localhost:27017/exif");
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/exif", {
+  useNewUrlParser: true,
+});
 
 app.get("/exif", async (req, res) => {
   const url = req.query.url;
@@ -15,8 +17,7 @@ app.get("/exif", async (req, res) => {
   if (!data) {
     const rawData = await getRaw(url);
     return res.json(rawData.exif);
-  }
-  else {
+  } else {
     return res.json(data.exif);
   }
 });
@@ -28,8 +29,7 @@ app.get("/gps", async (req, res) => {
   if (!data) {
     const rawData = await getRaw(url);
     return res.json(rawData.gps);
-  }
-  else {
+  } else {
     return res.json(data.gps);
   }
 });
