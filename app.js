@@ -6,9 +6,12 @@ const { Raw } = require("./lib/database");
 const app = express();
 const port = 1216;
 
-mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/exif", {
-  useNewUrlParser: true,
-});
+mongoose
+  .connect(process.env.MONGODB_URL || "mongodb://localhost:27017/exif", {
+    useNewUrlParser: true,
+  })
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.error("Filed to connect to MongoDB", err));
 
 app.get("/exif", async (req, res) => {
   const url = req.query.url;

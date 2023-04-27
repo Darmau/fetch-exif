@@ -1,0 +1,27 @@
+version: '3'
+services:
+  mongo:
+    image: mongo:5.0.17
+    restart: always
+    ports:
+      - 27017:27017
+    networks:
+      - app-network
+    volumes:
+      - ./data:/data/db
+
+  api:
+    image: darmau/fetch-exif:2.0
+    restart: always
+    ports:
+      - 1216:1216
+    networks:
+      - app-network
+    environment:
+      MONGODB_URL: mongodb://mongo:27017/exif
+    depends_on:
+      - mongo
+
+networks:
+  app-network:
+    driver: bridge
