@@ -1,47 +1,37 @@
 const express = require("express");
-const getExif = require("./lib/exif");
-const getGPS = require("./lib/gps");
-const NodeCache = require("node-cache");
-const cache = new NodeCache({ stdTTL: 3600, checkperiod: 43200 });
+const mongoose = require("mongoose");
+const getRaw = require("./lib/getRaw");
+const { Raw } = require("./lib/database");
 
 const app = express();
 const port = 1216;
 
+mongoose.connect("mongodb://localhost:27017/exif");
+
 app.get("/exif", async (req, res) => {
   const url = req.query.url;
-  const cacheKey = `exif:${url}`;
-  let exifData = cache.get(cacheKey);
+  const data = await Raw.findOne({ url: url });
 
-  if (!exifData) {
-    try {
-      exifData = await getExif(url);
-    } catch (err) {
-      return res.status(500).send(err.message);
-    }
-    cache.set(cacheKey, exifData, 3600);
-    res.json(exifData);
-  } else {
-    res.json(exifData);
+  if (!data) {
+    const rawData = await getRaw(url);
+    return res.json(rawData.exif);
   }
-
+  else {
+    return res.json(data.exif);
+  }
 });
 
 app.get("/gps", async (req, res) => {
   const url = req.query.url;
-  const cacheKey = `gps:${url}`;
-  let gpsData = cache.get(cacheKey);
+  const data = await Raw.findOne({ url: url });
 
-  if (!gpsData) {
-    try {
-      gpsData = await getGPS(url);
-    } catch (err) {
-      return res.status(500).send(err.message);
-    }
-    cache.set(cacheKey, gpsData, 3600);
-    res.json(gpsData);
-  } else {
-    res.json(gpsData);
+  if (!data) {
+    const rawData = await getRaw(url);
+    return res.json(rawData.gps);
+  }
+  else {
+    return res.json(data.gps);
   }
 });
 
-app.listen(port, () => console.log(`Exif查询接口正在运行 ${port}!`));
+app.listen(port, () => console.log(`Fetch EXIF is running on port ${port}!`));
