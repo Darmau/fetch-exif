@@ -11,7 +11,7 @@ services:
       - ./data:/data/db
 
   api:
-    image: darmau/fetch-exif:2.0
+    image: darmau/fetch-exif:2.1
     restart: always
     ports:
       - 1216:1216
